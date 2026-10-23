@@ -158,33 +158,200 @@
                 >
               </div>
             </div>
+
+            <!-- Style Preset / Stil-Auswahl -->
+            <div class="form-group">
+              <label for="stylePreset">
+                <span>Image Style / Bildstil</span>
+                <small class="hint">Artistic style or rendering medium</small>
+              </label>
+              <select id="stylePreset">
+                <option value="none" selected>None (Default)</option>
+                <option value="photoreal">Photoreal</option>
+                <option value="hyperreal">Hyperreal</option>
+                <option value="pencil-drawing">Pencil Drawing</option>
+                <option value="ink-drawing">Ink Drawing</option>
+                <option value="oil-painting">Oil Painting</option>
+                <option value="watercolor">Watercolor</option>
+                <option value="anime-manga">Anime / Manga</option>
+                <option value="impressionism">Impressionism</option>
+                <option value="pop-art">Pop Art</option>
+                <option value="surrealism">Surrealism</option>
+                <option value="digital-art">Digital Art / Concept Art</option>
+                <option value="3d-rendered">3D-Rendered</option>
+              </select>
+            </div>
           </div>
         </details>
 
         <!-- General Prompt Input (Persistent Base / Style) -->
-        <div class="form-group">
-          <label for="generalPrompt">
-            <span>General Prompt (Base / Style / Mood)</span>
-            <small class="hint">Persistent style & lighting (saved in browser)</small>
-          </label>
+        <div class="form-group prompt-form-group" id="generalPromptGroup">
+          <div class="prompt-header-row">
+            <label for="generalPrompt" class="prompt-main-label">
+              <span>General Prompt (Base / Style / Mood)</span>
+              <small class="hint">Persistent style & lighting (saved in browser)</small>
+            </label>
+            <div class="prompt-toolbar-actions">
+              <button
+                type="button"
+                id="refineGeneralPromptBtn"
+                class="btn-prompt-action btn-prompt-refine"
+                title="Refine and enhance this General Prompt using the configured LLM"
+              >
+                <span class="refine-icon">✨</span>
+                <span>Refine with LLM</span>
+                <span class="refine-spinner hidden"></span>
+              </button>
+              <button
+                type="button"
+                id="undoGeneralPromptBtn"
+                class="btn-prompt-action btn-prompt-undo btn-disabled"
+                title="Undo last prompt change"
+                disabled
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 7v6h6"></path>
+                  <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+                </svg>
+                <span>Undo</span>
+              </button>
+              <button
+                type="button"
+                id="saveGeneralPromptBtn"
+                class="btn-prompt-action btn-prompt-save"
+                title="Save current prompt to saved history list"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                <span>Save</span>
+              </button>
+            </div>
+          </div>
           <textarea
             id="generalPrompt"
             rows="2"
             placeholder="e.g. cinematic lighting, highly detailed, photorealistic, 8k resolution, masterpiece..."
           ></textarea>
+
+          <!-- Collapsible for Saved General Prompts -->
+          <details id="generalSavedDetails" class="prompt-history-collapsible">
+            <summary class="prompt-history-summary">
+              <div class="summary-left">
+                <span class="collapsible-arrow">▶</span>
+                <span class="summary-title">📁 Saved General Prompts</span>
+              </div>
+              <div class="summary-right">
+                <span id="generalSavedCountBadge" class="saved-count-badge">0</span>
+              </div>
+            </summary>
+            <div class="prompt-history-content">
+              <div class="prompt-history-controls">
+                <span class="history-label">Sort by:</span>
+                <select id="generalPromptSort" class="history-sort-select">
+                  <option value="newest" selected>Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="alpha-asc">A → Z</option>
+                  <option value="alpha-desc">Z → A</option>
+                  <option value="length-desc">Longest First</option>
+                  <option value="length-asc">Shortest First</option>
+                </select>
+              </div>
+              <div id="generalSavedList" class="saved-prompts-list">
+                <!-- Dynamically rendered saved general prompts -->
+              </div>
+            </div>
+          </details>
         </div>
 
         <!-- Detail Prompt Input -->
-        <div class="form-group">
-          <label for="prompt">
-            <span>Detail Prompt (Subject / Scene)</span>
-            <small class="hint">Specific scene or variation</small>
-          </label>
+        <div class="form-group prompt-form-group" id="detailPromptGroup">
+          <div class="prompt-header-row">
+            <div class="label-with-toggle">
+              <label for="prompt" class="prompt-main-label">
+                <span>Detail Prompt (Subject / Scene)</span>
+                <small class="hint">Specific scene or variation</small>
+              </label>
+              <label class="llm-toggle-label" title="When active, the prompt is expanded into multiple variations via the configured LLM">
+                <input type="checkbox" id="useMultiplePromptLLM" class="llm-checkbox">
+                <span class="toggle-text">✨ Multiple Prompt per LLM</span>
+              </label>
+            </div>
+            <div class="prompt-toolbar-actions">
+              <button
+                type="button"
+                id="refineDetailPromptBtn"
+                class="btn-prompt-action btn-prompt-refine"
+                title="Refine and enhance this Detail Prompt using the configured LLM"
+              >
+                <span class="refine-icon">✨</span>
+                <span>Refine with LLM</span>
+                <span class="refine-spinner hidden"></span>
+              </button>
+              <button
+                type="button"
+                id="undoDetailPromptBtn"
+                class="btn-prompt-action btn-prompt-undo btn-disabled"
+                title="Undo last prompt change"
+                disabled
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 7v6h6"></path>
+                  <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+                </svg>
+                <span>Undo</span>
+              </button>
+              <button
+                type="button"
+                id="saveDetailPromptBtn"
+                class="btn-prompt-action btn-prompt-save"
+                title="Save current prompt to saved history list"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                <span>Save</span>
+              </button>
+            </div>
+          </div>
           <textarea
             id="prompt"
             rows="3"
             placeholder="e.g. A picturesque castle on a cliff above the stormy sea at sunset..."
           ></textarea>
+
+          <!-- Collapsible for Saved Detail Prompts -->
+          <details id="detailSavedDetails" class="prompt-history-collapsible">
+            <summary class="prompt-history-summary">
+              <div class="summary-left">
+                <span class="collapsible-arrow">▶</span>
+                <span class="summary-title">📁 Saved Detail Prompts</span>
+              </div>
+              <div class="summary-right">
+                <span id="detailSavedCountBadge" class="saved-count-badge">0</span>
+              </div>
+            </summary>
+            <div class="prompt-history-content">
+              <div class="prompt-history-controls">
+                <span class="history-label">Sort by:</span>
+                <select id="detailPromptSort" class="history-sort-select">
+                  <option value="newest" selected>Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="alpha-asc">A → Z</option>
+                  <option value="alpha-desc">Z → A</option>
+                  <option value="length-desc">Longest First</option>
+                  <option value="length-asc">Shortest First</option>
+                </select>
+              </div>
+              <div id="detailSavedList" class="saved-prompts-list">
+                <!-- Dynamically rendered saved detail prompts -->
+              </div>
+            </div>
+          </details>
         </div>
 
         <!-- Generate Button -->
@@ -269,7 +436,7 @@
     </footer>
   </div>
 
-  <!-- Settings Modal (API Key & Model Selection) -->
+  <!-- Settings Modal (BFL & LLM Selection) -->
   <div id="settingsModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-card">
       <div class="modal-header">
@@ -278,7 +445,12 @@
       </div>
 
       <div class="modal-body">
-        <!-- API Key Input -->
+        <!-- Section 1: Black Forest Labs FLUX Settings -->
+        <div class="modal-section-title">
+          <span>FLUX Image Generator</span>
+        </div>
+
+        <!-- BFL API Key Input -->
         <div class="form-group">
           <label for="apiKey">
             <span>BFL API Key</span>
@@ -295,9 +467,9 @@
           </div>
         </div>
 
-        <!-- Model Selection -->
+        <!-- BFL Model Selection -->
         <div class="form-group">
-          <label for="endpoint">Model</label>
+          <label for="endpoint">Flux Model</label>
           <select id="endpoint">
             <option value="flux-3-image">Flux 3 Image</option>
             <option value="flux-3-image-klein">Flux 3 Image Klein</option>
@@ -308,10 +480,109 @@
             <option value="flux-2-klein-4b">Flux 2 Klein (4B)</option>
           </select>
         </div>
+
+        <!-- Section 2: LLM Multiple Prompt Expansion Settings -->
+        <div class="modal-section-title modal-section-divider">
+          <span>LLM Prompt Assistant (Mistral, Claude, ChatGPT, Gemini)</span>
+        </div>
+
+        <!-- LLM Provider Selection -->
+        <div class="form-group">
+          <label for="llmProvider">LLM Provider</label>
+          <select id="llmProvider">
+            <option value="chatgpt" selected>ChatGPT (OpenAI)</option>
+            <option value="claude">Claude (Anthropic)</option>
+            <option value="mistral">Mistral AI</option>
+            <option value="gemini">Gemini (Google)</option>
+          </select>
+        </div>
+
+        <!-- LLM Model Selection -->
+        <div class="form-group">
+          <label for="llmModel">LLM Model</label>
+          <select id="llmModel">
+            <!-- Dynamically populated based on chosen provider -->
+          </select>
+        </div>
+
+        <!-- LLM API Key Input -->
+        <div class="form-group">
+          <label for="llmApiKey">
+            <span id="llmApiKeyLabel">ChatGPT API Key</span>
+            <small class="hint">Stored in browser localStorage</small>
+          </label>
+          <div class="input-with-button">
+            <input
+              type="password"
+              id="llmApiKey"
+              placeholder="sk-..."
+              autocomplete="off"
+            >
+            <button type="button" id="toggleLlmApiKey" class="btn-secondary" title="Show/hide LLM API key">Show</button>
+          </div>
+        </div>
       </div>
 
       <div class="modal-footer">
         <button type="button" id="saveSettingsBtn" class="btn-primary">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save All Images to Folder Modal -->
+  <div id="saveAllModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="saveAllModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="saveAllModalTitle">Save All Images</h2>
+        <button type="button" id="closeSaveAllModalBtn" class="btn-close" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-description">
+          Select or enter a target directory on your computer to save all generated gallery images.
+        </p>
+
+        <div class="form-group">
+          <label for="saveFolderPathInput">
+            <span>Destination Folder / Zielordner</span>
+            <small class="hint">Directory where all images will be saved</small>
+          </label>
+          <div class="input-with-button">
+            <input
+              type="text"
+              id="saveFolderPathInput"
+              placeholder="e.g. C:\Users\Username\Pictures\FluxImages"
+              autocomplete="off"
+            >
+            <button type="button" id="browseFolderBtn" class="btn-secondary" title="Select folder via native file dialog">
+              📁 Browse...
+            </button>
+          </div>
+        </div>
+
+        <div id="saveAllProgress" class="save-progress-area hidden">
+          <div class="status-indicator">
+            <div class="pulsing-dot"></div>
+            <span id="saveAllStatusText">Saving images to disk...</span>
+          </div>
+          <div class="save-progress-bar-container">
+            <div id="saveAllProgressBar" class="save-progress-bar" style="width: 0%;"></div>
+          </div>
+          <div class="save-progress-stats">
+            <span id="saveAllCountText">0 / 0</span>
+            <span id="saveAllPercentText">0%</span>
+          </div>
+        </div>
+
+        <div id="saveAllError" class="modal-error hidden"></div>
+        <div id="saveAllSuccess" class="modal-success hidden"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="cancelSaveAllBtn" class="btn-secondary">Cancel</button>
+        <button type="button" id="confirmSaveAllBtn" class="btn-primary">
+          <span id="confirmSaveAllBtnText">Save Images</span>
+        </button>
       </div>
     </div>
   </div>

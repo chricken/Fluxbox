@@ -1178,17 +1178,491 @@ textarea {
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* Label with toggle checkbox */
+.label-with-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.label-with-toggle label {
+  margin-bottom: 0;
+}
+
+.llm-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  background: var(--accent-badge-bg);
+  border: 1px solid var(--accent-badge-border);
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  transition: var(--transition);
+  user-select: none;
+}
+
+.llm-toggle-label:hover {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: var(--primary);
+}
+
+.llm-checkbox {
+  cursor: pointer;
+  accent-color: var(--primary);
+  width: 15px;
+  height: 15px;
+  margin: 0;
+}
+
+/* Modal Sections */
+.modal-section-title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: -0.25rem;
+}
+
+.modal-section-divider {
+  border-top: 1px solid var(--card-border);
+  padding-top: 1.25rem;
+  margin-top: 0.25rem;
+}
+
 .modal-body {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .modal-footer {
   display: flex;
   justify-content: flex-end;
+  gap: 0.75rem;
   padding: 1rem 1.5rem;
   border-top: 1px solid var(--card-border);
   background: rgba(15, 23, 42, 0.3);
+}
+
+.modal-description {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.modal-error {
+  padding: 0.75rem 1rem;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  word-break: break-word;
+}
+
+.modal-success {
+  padding: 0.75rem 1rem;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  word-break: break-word;
+}
+
+.save-progress-area {
+  padding: 1rem;
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--card-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.save-progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+}
+
+.save-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--gradient-primary);
+  border-radius: 9999px;
+  transition: width 0.25s ease-out;
+}
+
+.save-progress-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Prompt Toolbar & Header Actions (Refine, Undo, Save)
+   ========================================================================== */
+
+.prompt-form-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.prompt-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.prompt-main-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-label);
+}
+
+.prompt-toolbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.btn-prompt-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  background: var(--bg-hover);
+  border: 1px solid var(--card-border);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: var(--transition);
+  user-select: none;
+}
+
+.btn-prompt-action svg {
+  flex-shrink: 0;
+}
+
+.btn-prompt-action:hover:not(:disabled):not(.btn-disabled) {
+  background: var(--card-bg);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.btn-prompt-action:disabled,
+.btn-prompt-action.btn-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+}
+
+.btn-prompt-refine {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
+  border-color: rgba(99, 102, 241, 0.4);
+  color: var(--accent);
+}
+
+.btn-prompt-refine:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.28), rgba(168, 85, 247, 0.28));
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+}
+
+.btn-prompt-refine.is-refining {
+  opacity: 0.8;
+  cursor: wait;
+  pointer-events: none;
+}
+
+.refine-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-left: 0.2rem;
+}
+
+.btn-prompt-undo {
+  color: var(--text-main);
+}
+
+.btn-prompt-undo:hover:not(:disabled):not(.btn-disabled) {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.btn-prompt-save {
+  color: var(--text-main);
+}
+
+.btn-prompt-save:hover:not(:disabled) {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+/* ==========================================================================
+   Prompt History Collapsible & Saved List
+   ========================================================================== */
+
+.prompt-history-collapsible {
+  margin-top: 0.25rem;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-hover);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.prompt-history-collapsible[open] {
+  border-color: var(--primary);
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.prompt-history-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.85rem;
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  user-select: none;
+  transition: var(--transition);
+}
+
+.prompt-history-summary::-webkit-details-marker {
+  display: none;
+}
+
+.prompt-history-summary:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-main);
+}
+
+.prompt-history-summary .summary-left {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.prompt-history-summary .collapsible-arrow {
+  font-size: 0.7rem;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+  opacity: 0.7;
+}
+
+.prompt-history-collapsible[open] .collapsible-arrow {
+  transform: rotate(90deg);
+}
+
+.saved-count-badge {
+  background: var(--bg-input);
+  border: 1px solid var(--card-border);
+  color: var(--accent);
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.prompt-history-content {
+  padding: 0.75rem 0.85rem 0.85rem 0.85rem;
+  border-top: 1px solid var(--card-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.prompt-history-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.history-label {
+  font-weight: 500;
+}
+
+.history-sort-select {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  border: 1px solid var(--card-border);
+  color: var(--text-main);
+  width: auto;
+  cursor: pointer;
+}
+
+.history-sort-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.saved-prompts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.saved-prompts-empty {
+  padding: 1.25rem;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  border: 1px dashed var(--card-border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.saved-prompt-item {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.saved-prompt-item:hover {
+  border-color: var(--primary);
+  background: var(--bg-hover);
+}
+
+.saved-prompt-item.item-highlight {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+  animation: pulse-saved-item 1.5s ease-out;
+}
+
+@keyframes pulse-saved-item {
+  0% {
+    transform: scale(0.98);
+  }
+  50% {
+    transform: scale(1.01);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.saved-prompt-content {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.saved-prompt-text {
+  margin: 0;
+  font-size: 0.83rem;
+  line-height: 1.4;
+  color: var(--text-main);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.saved-prompt-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.saved-prompt-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.btn-item-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  background: var(--bg-hover);
+  border: 1px solid var(--card-border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-item-action:hover {
+  color: var(--text-main);
+}
+
+.btn-item-apply {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.25);
+  color: var(--accent);
+}
+
+.btn-item-apply:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.btn-item-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #ef4444;
 }

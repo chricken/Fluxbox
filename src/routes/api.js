@@ -1,7 +1,100 @@
 import { Router } from 'express';
 import { submitGenerationTask, pollTaskResult, fetchAccountCredits } from '../services/bflService.js';
+import { generatePromptsWithLLM, refinePromptWithLLM } from '../services/llmService.js';
+import { openNativeFolderDialog, saveImagesToDisk, getDefaultSaveDirectory } from '../services/fileService.js';
 
 export const apiRouter = Router();
+
+/**
+ * POST /api/llm/refine-prompt
+ * Enhances/refines a single prompt (detail or general) using the selected LLM provider.
+ */
+apiRouter.post('/llm/refine-prompt', async (req, res) => {
+  try {
+    const { provider, model, apiKey, prompt, promptType } = req.body;
+
+    if (!provider) {
+      return res.status(400).json({ error: 'LLM provider is required (Mistral, Claude, ChatGPT, Gemini).' });
+    }
+
+    if (!apiKey) {
+      return res.status(400).json({ error: `API key for ${provider} is missing. Please configure it in Settings.` });
+    }
+
+    if (!prompt || typeof prompt !== 'string' || prompt.trim() === '') {
+      return res.status(400).json({ error: 'Prompt text cannot be empty to refine.' });
+    }
+
+    const refinedPrompt = await refinePromptWithLLM({
+      provider,
+      model,
+      apiKey,
+      prompt: prompt.trim(),
+      promptType: promptType || 'detail'
+    });
+
+    return res.json({
+      success: true,
+      provider,
+      model,
+      originalPrompt: prompt.trim(),
+      refinedPrompt
+    });
+  } catch (error) {
+    console.error('API /llm/refine-prompt error:', error.message);
+    const status = error.status || 500;
+    return res.status(status).json({
+      error: error.message || 'Failed to refine prompt with LLM'
+    });
+  }
+});
+
+/**
+ * POST /api/llm/generate-prompts
+ * Generates prompt variations using the selected LLM provider.
+ */
+apiRouter.post('/llm/generate-prompts', async (req, res) => {
+  try {
+    const { provider, model, apiKey, prompt, generalPrompt } = req.body;
+
+    if (!provider) {
+      return res.status(400).json({ error: 'LLM provider is required (Mistral, Claude, ChatGPT, Gemini).' });
+    }
+
+    if (!apiKey) {
+      return res.status(400).json({ error: `API key for ${provider} is missing. Please configure it in Settings.` });
+    }
+
+    const hasPrompt = prompt && typeof prompt === 'string' && prompt.trim() !== '';
+    const hasGeneral = generalPrompt && typeof generalPrompt === 'string' && generalPrompt.trim() !== '';
+
+    if (!hasPrompt && !hasGeneral) {
+      return res.status(400).json({ error: 'Prompt must not be empty.' });
+    }
+
+    const prompts = await generatePromptsWithLLM({
+      provider,
+      model,
+      apiKey,
+      prompt: hasPrompt ? prompt.trim() : '',
+      generalPrompt: hasGeneral ? generalPrompt.trim() : ''
+    });
+
+    return res.json({
+      success: true,
+      provider,
+      model,
+      count: prompts.length,
+      prompts
+    });
+  } catch (error) {
+    console.error('API /llm/generate-prompts error:', error.message);
+    const status = error.status || 500;
+    return res.status(status).json({
+      error: error.message || 'Failed to generate prompt variations with LLM'
+    });
+  }
+});
 
 /**
  * POST /api/generate
@@ -119,5 +212,63 @@ apiRouter.get('/download', async (req, res) => {
   } catch (error) {
     console.error('API /download error:', error.message);
     return res.status(500).json({ error: 'Failed to download image proxy' });
+  }
+});
+
+/**
+ * GET or POST /api/select-folder
+ * Opens native OS directory selection dialog and returns chosen path.
+ */
+apiRouter.all('/select-folder', async (req, res) => {
+  try {
+    const result = await openNativeFolderDialog();
+    const defaultFolder = getDefaultSaveDirectory();
+    return res.json({
+      ...result,
+      defaultFolder
+    });
+  } catch (error) {
+    console.error('API /select-folder error:', error.message);
+    return res.status(500).json({
+      error: error.message || 'Failed to open folder selection dialog',
+      defaultFolder: getDefaultSaveDirectory()
+    });
+  }
+});
+
+/**
+ * GET /api/default-folder
+ * Returns default save directory path on host system.
+ */
+apiRouter.get('/default-folder', (req, res) => {
+  try {
+    const defaultFolder = getDefaultSaveDirectory();
+    return res.json({ defaultFolder });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/save-all
+ * Downloads and saves an array of generated image items directly to the specified folder on disk.
+ */
+apiRouter.post('/save-all', async (req, res) => {
+  try {
+    const { folderPath, images } = req.body;
+
+    if (!folderPath || typeof folderPath !== 'string' || !folderPath.trim()) {
+      return res.status(400).json({ error: 'Folder path is required to save images.' });
+    }
+
+    if (!Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({ error: 'No images provided to save.' });
+    }
+
+    const result = await saveImagesToDisk({ folderPath, images });
+    return res.json(result);
+  } catch (error) {
+    console.error('API /save-all error:', error.message);
+    return res.status(500).json({ error: error.message || 'Failed to save images to folder' });
   }
 });
