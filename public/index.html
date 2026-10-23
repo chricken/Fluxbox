@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLUX Image Generator</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-top">
+        <div class="logo-badge">FLUX AI</div>
+        <div class="header-controls">
+          <div class="theme-picker" title="Choose Theme">
+            <label for="themeSelect" class="sr-only">Theme</label>
+            <select id="themeSelect" class="theme-select" aria-label="Select Theme">
+              <option value="dark">🌙 Dark</option>
+              <option value="light">☀️ Light</option>
+              <option value="elegant">✨ Elegant</option>
+              <option value="high-contrast">⚡ High Contrast</option>
+              <option value="neon">🔮 Neon</option>
+            </select>
+          </div>
+          <button type="button" id="openSettingsBtn" class="btn-icon-text" title="Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0 2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>Settings</span>
+          </button>
+        </div>
+      </div>
+      <h1>FLUX Image Generator</h1>
+      <p class="subtitle">Generate high-quality images with Black Forest Labs models</p>
+    </header>
+
+    <main class="card">
+      <!-- Active Config Bar -->
+      <div class="active-config-bar" id="activeConfigBar" role="button" tabindex="0" title="Click to open settings">
+        <div class="config-item">
+          <span class="config-label">Model:</span>
+          <span class="config-value" id="currentModelBadge">Flux 2 Pro</span>
+        </div>
+        <div class="config-item">
+          <span class="config-label">API Key:</span>
+          <span class="config-badge" id="apiKeyStatusBadge">Not set</span>
+        </div>
+        <span class="config-edit-hint">Change ⚙️</span>
+      </div>
+
+      <form id="generator-form">
+
+        <!-- Image Settings: Aspect Ratio, Resolution, Orientation -->
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="aspectRatio">Aspect Ratio</label>
+            <select id="aspectRatio">
+              <option value="1:1" selected>1:1 (Square)</option>
+              <option value="4:3">4:3</option>
+              <option value="16:9">16:9 (Widescreen)</option>
+              <option value="21:9">21:9 (Cinematic)</option>
+            </select>
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="resolution">Resolution</label>
+            <select id="resolution">
+              <option value="0.25">0.25 MP</option>
+              <option value="0.5">0.5 MP</option>
+              <option value="1" selected>1 MP</option>
+              <option value="2">2 MP</option>
+              <option value="4">4 MP</option>
+            </select>
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="orientation">Orientation</label>
+            <select id="orientation">
+              <option value="horizontal" selected>Horizontal</option>
+              <option value="vertical">Vertical</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Collapsible Advanced Settings (Number of Images, Seed, Color Preset) -->
+        <details id="advancedSettingsDetails" class="collapsible-section">
+          <summary class="collapsible-summary">
+            <div class="summary-left">
+              <span class="collapsible-arrow">▶</span>
+              <span class="summary-title">Advanced Generation Settings</span>
+            </div>
+            <span class="collapsible-preview-badge" id="advancedPreviewBadge">1 Image • Random Seed • Color: None</span>
+          </summary>
+
+          <div class="collapsible-content">
+            <!-- Number of Images & Seed -->
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="imageCount">
+                  <span>Number of Images</span>
+                </label>
+                <select id="imageCount">
+                  <option value="1" selected>1 Image</option>
+                  <option value="2">2 Images</option>
+                  <option value="3">3 Images</option>
+                  <option value="4">4 Images</option>
+                </select>
+              </div>
+
+              <div class="form-group flex-1">
+                <label for="seed">
+                  <span>Seed</span>
+                  <small class="hint">Optional (Random if empty)</small>
+                </label>
+                <div class="input-with-button">
+                  <input
+                    type="number"
+                    id="seed"
+                    placeholder="e.g. 42"
+                    min="0"
+                    max="2147483647"
+                  >
+                  <button type="button" id="randomSeedBtn" class="btn-secondary" title="Set random seed">🎲</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Color Preset / Farbvorgabe -->
+            <div class="form-group">
+              <label for="colorPreset">
+                <span>Color Preset / Farbvorgabe</span>
+                <small class="hint">Color mood & palette preset</small>
+              </label>
+              <div class="color-preset-container">
+                <select id="colorPreset">
+                  <option value="none" selected>Keine</option>
+                  <option value="colorful-neon">Colorful Neon</option>
+                  <option value="golden-hour">Golden Hour</option>
+                  <option value="sepia">Sepia</option>
+                  <option value="bw">B/W (Black & White)</option>
+                  <option value="yellow">Yellow</option>
+                  <option value="blue-turquoise">Blue / Turquoise</option>
+                  <option value="pastel">Pastel</option>
+                  <option value="cyberpunk">Cyberpunk (Neon Magenta/Cyan)</option>
+                  <option value="moody-dark">Moody Dark / Emerald</option>
+                  <option value="vintage-warm">Vintage Warm</option>
+                  <option value="custom">Custom</option>
+                </select>
+                <input
+                  type="text"
+                  id="customColorInput"
+                  class="hidden"
+                  placeholder="e.g. Emerald Green, Rose Gold, Dual Tone Coral & Teal..."
+                >
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- General Prompt Input (Persistent Base / Style) -->
+        <div class="form-group">
+          <label for="generalPrompt">
+            <span>General Prompt (Base / Style / Mood)</span>
+            <small class="hint">Persistent style & lighting (saved in browser)</small>
+          </label>
+          <textarea
+            id="generalPrompt"
+            rows="2"
+            placeholder="e.g. cinematic lighting, highly detailed, photorealistic, 8k resolution, masterpiece..."
+          ></textarea>
+        </div>
+
+        <!-- Detail Prompt Input -->
+        <div class="form-group">
+          <label for="prompt">
+            <span>Detail Prompt (Subject / Scene)</span>
+            <small class="hint">Specific scene or variation</small>
+          </label>
+          <textarea
+            id="prompt"
+            rows="3"
+            placeholder="e.g. A picturesque castle on a cliff above the stormy sea at sunset..."
+          ></textarea>
+        </div>
+
+        <!-- Generate Button -->
+        <button type="submit" id="generateBtn" class="btn-primary">
+          <span class="btn-text">Generate Image</span>
+          <div class="spinner hidden"></div>
+        </button>
+      </form>
+
+      <!-- Status / Loading -->
+      <div id="statusSection" class="status-section hidden">
+        <div class="status-indicator">
+          <div class="pulsing-dot"></div>
+          <span id="statusMessage">Starting generation...</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <!-- Error Display -->
+      <div id="errorSection" class="error-section hidden">
+        <div class="error-icon">!</div>
+        <div class="error-content">
+          <strong>An error occurred</strong>
+          <p id="errorMessage"></p>
+        </div>
+      </div>
+
+      <!-- Gallery Section (All generated images stay visible) -->
+      <div id="gallerySection" class="gallery-section hidden">
+        <div class="gallery-header">
+          <div class="gallery-title-group">
+            <h2>Generated Images</h2>
+            <span id="galleryCountBadge" class="gallery-count-badge">0</span>
+          </div>
+          <div class="gallery-header-actions">
+            <button type="button" id="saveAllBtn" class="btn-action-sm btn-accent" title="Download all generated images">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Save All</span>
+            </button>
+            <button type="button" id="clearAllBtn" class="btn-action-sm btn-outline-danger" title="Clear all images">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              <span>Clear</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="galleryGrid" class="gallery-grid">
+          <!-- Dynamic image cards will be rendered here -->
+        </div>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <div class="credits-panel" id="creditsPanel">
+        <div class="credits-summary">
+          <div class="credits-stat" id="statRemaining">
+            <span class="stat-label">Available Credits:</span>
+            <span class="stat-value" id="remainingCreditsVal">--</span>
+          </div>
+          <div class="credits-divider"></div>
+          <div class="credits-stat" id="statUsed">
+            <span class="stat-label">Last Generation Cost:</span>
+            <span class="stat-value" id="usedCreditsVal">--</span>
+          </div>
+          <button type="button" id="refreshCreditsBtn" class="btn-refresh" title="Refresh credit balance">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <p class="footer-note">Powered by <a href="https://docs.bfl.ml" target="_blank" rel="noopener">Black Forest Labs FLUX API</a></p>
+    </footer>
+  </div>
+
+  <!-- Settings Modal (API Key & Model Selection) -->
+  <div id="settingsModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modalTitle">Settings</h2>
+        <button type="button" id="closeSettingsBtn" class="btn-close" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- API Key Input -->
+        <div class="form-group">
+          <label for="apiKey">
+            <span>BFL API Key</span>
+            <small class="hint">Stored in browser localStorage</small>
+          </label>
+          <div class="input-with-button">
+            <input
+              type="password"
+              id="apiKey"
+              placeholder="bfl_live_..."
+              autocomplete="off"
+            >
+            <button type="button" id="toggleApiKey" class="btn-secondary" title="Show/hide API key">Show</button>
+          </div>
+        </div>
+
+        <!-- Model Selection -->
+        <div class="form-group">
+          <label for="endpoint">Model</label>
+          <select id="endpoint">
+            <option value="flux-3-image">Flux 3 Image</option>
+            <option value="flux-3-image-klein">Flux 3 Image Klein</option>
+            <option value="flux-2-max">Flux 2 Max</option>
+            <option value="flux-2-pro" selected>Flux 2 Pro (Recommended)</option>
+            <option value="flux-2-flex">Flux 2 Flex</option>
+            <option value="flux-2-klein-9b">Flux 2 Klein (9B)</option>
+            <option value="flux-2-klein-4b">Flux 2 Klein (4B)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="saveSettingsBtn" class="btn-primary">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
